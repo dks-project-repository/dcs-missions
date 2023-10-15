@@ -5,4 +5,4 @@
 ---
 
 dofile("C:/Dev/dcs-missions/Moose_pycharm/Moose.lua")
-dofile("C:/Dev/dcs-missions/Moose_pycharm/missions/Script.lua")
+dofile("C:/Dev/dcs-missions/Moose_pycharm/Script.lua")

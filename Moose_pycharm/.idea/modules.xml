@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/../MOOSE/.idea/MOOSE.iml" filepath="$PROJECT_DIR$/../MOOSE/.idea/MOOSE.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../MOOSE/Moose Development/Moose/.idea/Moose.iml" filepath="$PROJECT_DIR$/../../MOOSE/Moose Development/Moose/.idea/Moose.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/Moose_pycharm.iml" filepath="$PROJECT_DIR$/.idea/Moose_pycharm.iml" />
       <module fileurl="file://D:/SteamLibrary/steamapps/common/DCSWorld/Scripts/.idea/Scripts.iml" filepath="D:/SteamLibrary/steamapps/common/DCSWorld/Scripts/.idea/Scripts.iml" />
     </modules>
