@@ -152,7 +152,7 @@ function ReportPosition()
             local directionToUnit = AzimuthToDirection(azimuthToUnit)
 
             local text = string.format("%s Closest Unit: %d o'clock for %d m", playerName, directionToUnit, distanceToUnit)
-            --MESSAGE:New(text, 1):ToGroup(group)
+            MESSAGE:New(text, 1):ToGroup(group)
 
         end
     end)
