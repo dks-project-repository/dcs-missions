@@ -5,10 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5d829ebf-fde8-4c2b-acea-09a9247eaab1" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/Moose_pycharm.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Moose_pycharm.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Loader.lua" beforeDir="false" afterPath="$PROJECT_DIR$/Loader.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Script.lua" beforeDir="false" afterPath="$PROJECT_DIR$/Script.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/missions/MooseTest.miz" beforeDir="false" afterPath="$PROJECT_DIR$/missions/MooseTest.miz" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -39,17 +37,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
-    "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/Dev/MOOSE/Moose Development/Moose",
-    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Dev/dcs-missions/Moose_pycharm/missions&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;project.propVCSSupport.DirectoryMappings&quot;
   }
-}]]></component>
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Dev\dcs-missions\Moose_pycharm\missions" />
+    </key>
+  </component>
   <component name="RunManager">
     <configuration name="DCS Debugger" type="lua.emmy.debugger" factoryName="Emmy Debugger(NEW)">
       <option name="TYPE" value="1" />
@@ -83,7 +86,27 @@
           <line>95</line>
           <option name="timeStamp" value="6" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="lua-line">
+          <url>file://$PROJECT_DIR$/../../MOOSE/Moose Development/Moose/Core/Set.lua</url>
+          <line>4072</line>
+          <option name="timeStamp" value="17" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="lua-line">
+          <url>file://$PROJECT_DIR$/../../MOOSE/Moose Development/Moose/Core/Set.lua</url>
+          <line>4074</line>
+          <option name="timeStamp" value="18" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="lua-line">
+          <url>file://$PROJECT_DIR$/../../MOOSE/Moose Development/Moose/Core/Set.lua</url>
+          <line>4076</line>
+          <option name="timeStamp" value="19" />
+        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
+    <watches-manager>
+      <configuration name="lua.emmy.debugger">
+        <watch expression="unit:Name()" language="Lua" />
+      </configuration>
+    </watches-manager>
   </component>
 </project>

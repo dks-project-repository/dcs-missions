@@ -8,7 +8,10 @@ MESSAGE:New("*** SCRIPT LOADED ***", 5):ToAll()
 
 _SETTINGS:SetPlayerMenuOff();
 
-SAR_Players = {}
+--SAR_Players = {}
+
+-- @type SET_CLIENT
+SAR_PlayerGroups = SET_GROUP:New():FilterCategoryHelicopter();
 
 local function MenuActionDelegate(group)
     MESSAGE:New("Test Message " .. group:GetPlayerName(), 10):ToGroup(group)
@@ -16,8 +19,13 @@ end
 
 local function InitiatorToPlayerGroup(initiator)
     local group = initiator:getGroup()
-    local groupName = group:getName()
-    local playerGroup = GROUP:FindByName(groupName)
+    local playerGroup = GROUP:Find(group)
+    return playerGroup
+end
+
+local function InitiatorToUnit(initiator)
+    local unitName = initiator:getName()
+    local playerGroup = UNIT:FindByName(unitName)
     return playerGroup
 end
 
@@ -27,9 +35,11 @@ function RescuePlayer_OnEnter:onEvent(EventData)
         return false
     end
     if EventData.id == EVENTS.PlayerEnterAircraft then
+        local playerUnit = InitiatorToUnit(EventData.initiator)
         local playerGroup = InitiatorToPlayerGroup(EventData.initiator)
         MENU_GROUP_COMMAND:New(playerGroup, "Test Message", nil, MenuActionDelegate, playerGroup)
-        SAR_Players[playerGroup:GetPlayerName()] = playerGroup
+        --SAR_Players[playerGroup:GetPlayerName()] = playerGroup
+        SAR_PlayerGroups:AddGroup(playerGroup)
         MESSAGE:New("Welcome " .. playerGroup:GetPlayerName(), 10):ToGroup(playerGroup)
     end
 end
@@ -41,10 +51,12 @@ function RescuePlayer_OnLeave:onEvent(EventData)
         return false
     end
     if EventData.id == EVENTS.PlayerLeaveUnit then
+        local playerUnit = InitiatorToUnit(EventData.initiator)
         local playerGroup = InitiatorToPlayerGroup(EventData.initiator)
         MENU_GROUP_COMMAND:New(playerGroup, "Test Message", nil, MenuActionDelegate, playerGroup)
         --local playerName = initiator:getPlayerName() or "Player"
-        MESSAGE:New("Welcome " .. playerGroup:GetPlayerName(), 10):ToGroup(playerGroup)
+        SAR_PlayerGroups:Remove(playerGroup:GetPlayerName())
+        MESSAGE:New("Left " .. playerGroup:GetPlayerName(), 10):ToAll()
     end
 end
 world.addEventHandler(RescuePlayer_OnLeave)
@@ -65,8 +77,13 @@ function RescuePlayer_OnLeave:onEvent(EventData)
 end
 world.addEventHandler(RescuePlayer_OnLeave)
 
-GroundSpawnZones = { ZONE:New("New Trigger Zone-1") }
+GroundSpawnZones = { ZONE:New("New Trigger Zone-2") }
 GroundUnitTemplates = { "Ground-1" }
+
+
+--@type SET_GROUP
+GroundSpawns = SPAWN:New("Ground-1"):InitLimit(100, 100)
+RescueGroups = SET_GROUP:New();
 
 SpawnIndex = 1;
 function SpawnSomething()
@@ -76,47 +93,137 @@ function SpawnSomething()
     if (RandomPositionInZone == nil) then
         return
     end
+    local surface = RandomPositionInZone:GetSurfaceType()
     ---- Group Template
+    if (surface == land.SurfaceType.WATER) then
+        return
+    end
 
-    local SpawnGroundUnit1 = SPAWN
-    --:InitLimit(10, 10)
-            :NewWithAlias(GroundUnitTemplates[1], "New-" .. SpawnIndex)
-            :SpawnFromPointVec2(RandomPositionInZone)
+    local SpawnGroundUnit1 = GroundSpawns:SpawnFromPointVec2(RandomPositionInZone)
+    if (SpawnGroundUnit1 == nil) then
+        return
+    end
+    RescueGroups:AddGroup(SpawnGroundUnit1)
     SpawnIndex = SpawnIndex + 1
-    MESSAGE:New("Spawn " .. SpawnIndex, 1):ToAll()
+    --RescueGroups:AddInDatabase(EVENTS.Birth)
+    --SET_UNIT:AddInDatabase()
+    -- MESSAGE:New("Spawn " .. SpawnIndex.." "..surface, 1):ToAll()
 end
-SCHEDULER:New(nil, SpawnSomething, {}, 0, 1)
+--SCHEDULER:New(nil, SpawnSomething, {}, 0, 1)
+do
+    for i = 1, 100 do
+        SpawnSomething()
+    end
+    MESSAGE:New("Spawned 100 units", 1):ToAll()
+end
 
 TestZone = ZONE:FindByName("New Trigger Zone-1")
 TestZone:SmokeZone(SMOKECOLOR.White, 1)
 
 function ReportPosition()
-    for playerName, group in pairs(SAR_Players) do
-        if (group ~= nil and playerName ~= nil and group:IsCompletelyInZone(TestZone)) then
-            local v2 = group:GetPointVec2()
-            local distance = TestZone:Get2DDistance(v2)
-            MESSAGE:New(playerName .. " In Zone \n" .. distance, 1):ToAll()
-        end
-    end
-end
---SCHEDULER:New(nil, ReportPosition, {}, 0, 1)
+    SAR_PlayerGroups:ForEachGroup(function(group)
+        local playerName = group:GetPlayerName()
+        if (playerName ~= nil and group:IsCompletelyInZone(TestZone)) then
+            local playerCoord = group:GetCoordinate()
+            local playerUnit = group:GetUnit()
+            --local playerX = math.modf(coord.x / 2000)
+            --local playerY = math.modf(coord.y / 2000)
+            --local playerLocationDisplay = " X:" .. playerX .. " Y:" .. playerY
+            local Closest_SET = playerCoord:ScanUnits(150)
+            Closest_SET:ForEachUnit(function(unit)
+                local unitName = unit:Name()
+                if (unit ~= nil and unit:GetUnitCategory() ~= Unit.Category.GROUND_UNIT) then
+                    Closest_SET:Remove(unitName, false)
+                end
+                if (unit:IsAlive() ~= true) then
+                    Closest_SET:Remove(unitName, false)
+                end
+            end)
 
-function ReportClosestUnit()
-    for playerName, group in pairs(SAR_Players) do
-        if (group ~= nil and playerName ~= nil and group:IsCompletelyInZone(TestZone)) then
-            local v2 = group:GetPointVec2()
-            local Closest = v2:FindClosestUnit(10000)
-            if (not Closest) then
+            local closestUnit, distanceToUnit = FindClosestUnitInSet(Closest_SET, playerCoord)
+            if (closestUnit == nil) then
                 return
             end
-            local ClosestPoint = Closest:GetPointVec2()
-            POINT_VEC2:FindClosestUnit()
-            local distance = ClosestPoint:Get2DDistance(v2)
-            MESSAGE:New(playerName .. " In Zone \n" .. distance, 1):ToAll()
+
+            local playerHeading = playerUnit:GetHeading()
+            local closestUnitCoord = closestUnit:GetCoordinate()
+            local headingToClosestUnit = playerCoord:HeadingTo(closestUnitCoord)
+            local azimuthToUnit = headingToClosestUnit - playerHeading
+            local directionToUnit = AzimuthToDirection(azimuthToUnit)
+
+            local text = string.format("%s Closest Unit: %d o'clock for %d m", playerName, directionToUnit, distanceToUnit)
+            --MESSAGE:New(text, 1):ToGroup(group)
+
+        end
+    end)
+end
+SCHEDULER:New(nil, ReportPosition, {}, 0, 1)
+
+function FindClosestUnitInSet(units, coord)
+
+    local umin = nil --Wrapper.Unit#UNIT
+    local dmin = math.huge
+    for _, _unit in pairs(units.Set) do
+        local unit = _unit --Wrapper.Unit#UNIT
+        local coordinate = unit:GetCoordinate()
+        local d = coord:Get2DDistance(coordinate)
+        if d < dmin then
+            dmin = d
+            umin = unit
         end
     end
+
+    return umin, UTILS.Round(dmin)
 end
-SCHEDULER:New(nil, ReportClosestUnit, {}, 0, 1)
+
+function AzimuthToDirection(degrees)
+    if (degrees == nil) then
+        return 0
+    end
+    local direction = UTILS.Round((degrees / 30) % 12, 0)
+    if (direction == 0) then
+        return 12
+    end
+    return direction
+
+end
+
+--function ReportClosestUnit()
+--    for playerName, group in pairs(SAR_Players) do
+--        if (group ~= nil and playerName ~= nil and group:IsCompletelyInZone(TestZone)) then
+--            local v2 = group:GetPointVec2()
+--            local Closest = v2:FindClosestUnit(10000)
+--            if (not Closest) then
+--                return
+--            end
+--            local ClosestPoint = Closest:GetPointVec2()
+--            POINT_VEC2:FindClosestUnit()
+--            local distance = ClosestPoint:Get2DDistance(v2)
+--            MESSAGE:New(playerName .. " In Zone \n" .. distance, 1):ToAll()
+--        end
+--    end
+--end
+
+--UnitsNearPlayer = SET_UNIT:New()
+function ReportClosestUnit()
+    local unitsByDistance = {}
+    SAR_PlayerGroups:ForEachGroup(function(playerGrp)
+        local playerPosition = playerGrp:GetPointVec2();
+        RescueGroups:ForEachGroup(function(rescueGrp)
+            local rescuePoint = rescueGrp:GetPointVec2()
+            --local distance = UTILS.IsInRadius(playerPosition, rescuePoint, 150)
+            local distance = UTILS.VecDist2D(playerPosition, rescuePoint)
+
+        end)
+    end)
+
+
+end
+--SCHEDULER:New(nil, ReportClosestUnit, {}, 0, 5)
+
+
+
+
 
 
 
